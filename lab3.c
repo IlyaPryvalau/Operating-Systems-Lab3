@@ -18,7 +18,7 @@
 #define OUTPUT_BUFFER 2 * 8192
 #define BITS_IN_BYTE 8
 #define NOT_SET 2
-#define ERROR_FILE "/home/illia/651005/Ilya/lab3/error.txt"
+#define ERROR_FILE "/home/ilya/651005/Ilya/lab3/error.txt"
 
 dev_t rootDev;
 TInoList IList;
@@ -66,7 +66,7 @@ void main(int argc, char *argv[]) {
         rootDev = entryStatRoot.st_dev;
     bufferOverflow = 0;
     DirExplore(programName, dirName, FErrorLog, &maxProc, &runningProc);
-    //printf("%s: pid %d %s\n",programName, getpid(), dirName); //uncomment if you want to see directories
+    //printf("%s: %d %s\n",programName, getpid(), dirName); //uncomment if you want to see directories
     if (bufferOverflow)
         write(FErrorLog, errorBuffer, strlen(errorBuffer));
     lseek(FErrorLog, 0, SEEK_SET);
@@ -133,7 +133,7 @@ void DirExplore(char *programName, char *dirName, int errorLog, int *maxProc, in
                             continue;
                         else {
                             DirExplore(programName, entryPath, errorLog, maxProc, runningProc);
-                            //printf("%s: pid %d %s\n",programName, getpid(), entryPath); //uncomment if you want to see directories
+                            //printf("%s: %d %s\n",programName, getpid(), entryPath); //uncomment if you want to see directories
                         }
                     }
                     //if file is a regular file
@@ -142,28 +142,28 @@ void DirExplore(char *programName, char *dirName, int errorLog, int *maxProc, in
                         if (dirEntryStat.st_nlink > 1) {
                             if (InoInList(&IList, dirEntryStat.st_ino, InoCompareInList) == -1) {
                                 InoListAdd(&IList, dirEntryStat.st_ino);
-                                //printf("%s: pid %d %s",programName, getpid(), entryPath);
+                                //printf("%s: %d %s",programName, getpid(), entryPath);
                                 CreateProcess(errorLog, entryPath, programName, maxProc, runningProc);
                             }
                         } else {
-                            //printf("%s: pid %d %s",programName, getpid(), entryPath);
+                            //printf("%s: %d %s",programName, getpid(), entryPath);
                             CreateProcess(errorLog, entryPath, programName, maxProc, runningProc); 
                         }
                     }
                     //if file is a sym link
                     if (dirEntry->d_type == DT_LNK) {
-                        printf("%s: pid %d %s (sym)\n",programName, getpid(), entryPath);
+                        printf("%d %s (sym)\n", getpid(), entryPath);
                     }
                 } 
             } else {
-                snprintf(errLine, 8192, "%s: pid %d %s %s\n", programName, getpid(), entryPath, strerror(errno));
+                snprintf(errLine, 8192, "%d %s %s\n", getpid(), entryPath, strerror(errno));
                 BufferedWrite(errorLog, errorBuffer, errLine); 
             }
             free(entryPath);
         }
         closedir(dir);
     } else {
-        snprintf(errLine, 8192, "%s: pid %d %s %s\n", programName, getpid(), dirName, strerror(errno));
+        snprintf(errLine, 8192, "%d %s %s\n", getpid(), dirName, strerror(errno));
         BufferedWrite(errorLog, errorBuffer, errLine);
     }
 }
@@ -251,7 +251,7 @@ int BitCount(int errorLog, char *filePath, char *programName) {
     }
     char *outBuffer = (char *)malloc(OUTPUT_BUFFER);
     //double bytesCheck = 0;
-    sprintf(outBuffer, "%s: pid %d %s ", programName, getpid(), filePath);
+    sprintf(outBuffer, "%d %s ", getpid(), filePath);
     for(int i = 0; i < 2; i++){
         sprintf(errLine, "%d: ",i);
         strcat(outBuffer, errLine);
@@ -281,7 +281,7 @@ int CreateProcess(int errorLog, char *filePath, char *programName, int *maxProc,
         *runningProc -= 1;
     }
     if ((FCurr = open(filePath, O_RDONLY)) == -1) {
-        snprintf(errLine, 8192, "%s: pid %d %s %s\n", programName, getpid(), filePath, strerror(errno));
+        snprintf(errLine, 8192, "%d %s %s\n", getpid(), filePath, strerror(errno));
         BufferedWrite(errorLog, errorBuffer, errLine);
         return 1;
     }
