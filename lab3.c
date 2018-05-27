@@ -18,7 +18,7 @@
 #define OUTPUT_BUFFER 2 * 8192
 #define BITS_IN_BYTE 8
 #define NOT_SET 2
-#define ERROR_FILE "/home/ilya/651005/Ilya/lab3/error.txt"
+#define ERROR_FILE "/tmp/error_log.txt"
 
 dev_t rootDev;
 TInoList IList;
